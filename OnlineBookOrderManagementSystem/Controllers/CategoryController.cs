@@ -60,6 +60,7 @@ namespace OnlineBookOrderManagementSystem.Controllers
             {
                 _context.Add(category);
                 await _context.SaveChangesAsync();
+                TempData["success"] = "Category Created Successfully";
                 return RedirectToAction(nameof(Index));
             }
             return View(category);
@@ -111,6 +112,7 @@ namespace OnlineBookOrderManagementSystem.Controllers
                         throw;
                     }
                 }
+                TempData["success"] = "Category Updated Successfully";
                 return RedirectToAction(nameof(Index));
             }
             return View(category);
@@ -146,6 +148,7 @@ namespace OnlineBookOrderManagementSystem.Controllers
             }
 
             await _context.SaveChangesAsync();
+            TempData["success"] = "Category Deleted Successfully";
             return RedirectToAction(nameof(Index));
         }
 
