@@ -1,0 +1,14 @@
+﻿using Microsoft.EntityFrameworkCore;
+using OnlineBookOrderManagementSystem.Models;
+
+namespace OnlineBookOrderManagementSystem.Data
+{
+    public class ApplicationDBContext: DbContext
+    {
+        public ApplicationDBContext(DbContextOptions options) : base(options)
+        {
+        }
+        public DbSet<Category> categories { get; set; }
+
+    }
+}
