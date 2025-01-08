@@ -1,0 +1,51 @@
+﻿using Microsoft.EntityFrameworkCore;
+using OnlineBookOrderManagementSystem.Data;
+using OnlineBookOrderManagementSystem.Repositories.IRepository;
+using System.Linq.Expressions;
+
+namespace OnlineBookOrderManagementSystem.Repositories.Repository
+{
+    public class Repository<T> : IRepository<T> where T : class
+    {
+        private readonly ApplicationDBContext _db;
+        internal DbSet<T> dbset;
+        public Repository(ApplicationDBContext db)
+        {
+            _db = db;
+            this.dbset = _db.Set<T>();
+        }
+        public async Task Add(T entity)
+        {
+            await dbset.AddAsync(entity);
+        }
+
+        public async Task<T> Get(Expression<Func<T, bool>> filter)
+        {
+            IQueryable<T> query = dbset;
+            query = query.Where(filter);
+            return await query.FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<T>> GetAll()
+        {
+            IQueryable<T> query = dbset;
+            return await query.ToListAsync();
+        }
+
+        public async Task Remove(T entity)
+        {
+            dbset.Remove(entity);
+        }
+
+        public async Task RemoveRange(T entity)
+        {
+            dbset.RemoveRange(entity);
+        }
+
+        public async Task Update(T entity)
+        {
+            dbset.Update(entity);
+        }
+
+    }
+}

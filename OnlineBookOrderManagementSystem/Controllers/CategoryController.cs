@@ -7,22 +7,29 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineBookOrderManagementSystem.Data;
 using OnlineBookOrderManagementSystem.Models;
+using OnlineBookOrderManagementSystem.Repositories.IRepository;
+using OnlineBookOrderManagementSystem.Repositories.Repository;
 
 namespace OnlineBookOrderManagementSystem.Controllers
 {
     public class CategoryController : Controller
     {
         private readonly ApplicationDBContext _context;
+        private readonly ICategoryReposiory categoryReposiory;
 
-        public CategoryController(ApplicationDBContext context)
+        public CategoryController(ApplicationDBContext context,ICategoryReposiory categoryReposiory)
         {
             _context = context;
+            this.categoryReposiory = categoryReposiory;
         }
 
         // GET: Category
         public async Task<IActionResult> Index()
         {
-            return View(await _context.categories.ToListAsync());
+            var categories = categoryReposiory.GetAll();
+            //var categoriess = _context.categories.ToListAsync();
+            //return View(await _context.categories.ToListAsync());
+            return View(await categories);
         }
 
         // GET: Category/Details/5
@@ -33,8 +40,9 @@ namespace OnlineBookOrderManagementSystem.Controllers
                 return NotFound();
             }
 
-            var category = await _context.categories
-                .FirstOrDefaultAsync(m => m.Id == id);
+            //var category = await _context.categories
+            //    .FirstOrDefaultAsync(m => m.Id == id);
+            var category = await categoryReposiory.Get(m => m.Id == id);
             if (category == null)
             {
                 return NotFound();
@@ -58,8 +66,9 @@ namespace OnlineBookOrderManagementSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(category);
-                await _context.SaveChangesAsync();
+                //_context.Add(category);
+                await categoryReposiory.Add(category);
+                await categoryReposiory.Save();
                 TempData["success"] = "Category Created Successfully";
                 return RedirectToAction(nameof(Index));
             }
@@ -74,7 +83,8 @@ namespace OnlineBookOrderManagementSystem.Controllers
                 return NotFound();
             }
 
-            var category = await _context.categories.FindAsync(id);
+            //var category = await _context.categories.FindAsync(id);
+            var category = await categoryReposiory.Get(x=>x.Id==id);
             if (category == null)
             {
                 return NotFound();
@@ -98,8 +108,10 @@ namespace OnlineBookOrderManagementSystem.Controllers
             {
                 try
                 {
-                    _context.Update(category);
-                    await _context.SaveChangesAsync();
+                    //_context.Update(category);
+                    await categoryReposiory.Update(category);
+                    //await _context.SaveChangesAsync();
+                    await categoryReposiory.Save();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -126,8 +138,8 @@ namespace OnlineBookOrderManagementSystem.Controllers
                 return NotFound();
             }
 
-            var category = await _context.categories
-                .FirstOrDefaultAsync(m => m.Id == id);
+            //var category = await _context.categories.FirstOrDefaultAsync(m => m.Id == id);
+            var category = await categoryReposiory.Get(m => m.Id == id);
             if (category == null)
             {
                 return NotFound();
@@ -141,10 +153,12 @@ namespace OnlineBookOrderManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.categories.FindAsync(id);
+            //var category = await _context.categories.FindAsync(id);
+            var category = await categoryReposiory.Get(x=>x.Id==id);
             if (category != null)
             {
-                _context.categories.Remove(category);
+                //_context.categories.Remove(category);
+                await categoryReposiory.Remove(category);
             }
 
             await _context.SaveChangesAsync();

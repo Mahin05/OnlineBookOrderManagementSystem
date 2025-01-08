@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineBookOrderManagementSystem.Data;
+using OnlineBookOrderManagementSystem.Repositories.IRepository;
+using OnlineBookOrderManagementSystem.Repositories.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDBContext>(z => z.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")
 ));
+builder.Services.AddScoped<ICategoryReposiory, CategoryReposiory>();
 
 var app = builder.Build();
 
