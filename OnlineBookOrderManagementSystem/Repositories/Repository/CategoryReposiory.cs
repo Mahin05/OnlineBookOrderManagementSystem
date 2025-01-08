@@ -13,10 +13,6 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
             _db = db;
         }
 
-        public async Task Save()
-        {
-            await _db.SaveChangesAsync();
-        }
 
         public async Task Update(CategoryController entity)
         {
