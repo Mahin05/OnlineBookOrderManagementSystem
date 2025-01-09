@@ -14,10 +14,14 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
             Category= new CategoryReposiory(_db);
         }
 
-        public void Save()
+        public async Task Save()
         {
-             _db.SaveChangesAsync();
+             await _db.SaveChangesAsync();
         }
+        //public void Save()
+        //{
+        //     _db.SaveChangesAsync();
+        //}
 
     }
 }

@@ -1,4 +1,4 @@
-﻿using OnlineBookOrderManagementSystem.Controllers;
+﻿using OnlineBookOrderManagementSystem.Areas.Admin.Controllers;
 using OnlineBookOrderManagementSystem.Data;
 using OnlineBookOrderManagementSystem.Models;
 using OnlineBookOrderManagementSystem.Repositories.IRepository;

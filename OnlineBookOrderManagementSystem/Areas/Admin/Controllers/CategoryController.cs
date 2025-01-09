@@ -10,8 +10,9 @@ using OnlineBookOrderManagementSystem.Models;
 using OnlineBookOrderManagementSystem.Repositories.IRepository;
 using OnlineBookOrderManagementSystem.Repositories.Repository;
 
-namespace OnlineBookOrderManagementSystem.Controllers
+namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class CategoryController : Controller
     {
         private readonly ApplicationDBContext _context;
@@ -28,10 +29,11 @@ namespace OnlineBookOrderManagementSystem.Controllers
         // GET: Category
         public async Task<IActionResult> Index()
         {
-            var categories = _unitOfWork.Category.GetAll();
+            var categories = await _unitOfWork.Category.GetAll();
             //var categoriess = _context.categories.ToListAsync();
             //return View(await _context.categories.ToListAsync());
-            return View(await categories);
+            var Result = categories.OrderBy(x => x.DisplayOrder);
+            return View(Result);
         }
 
         // GET: Category/Details/5
@@ -70,7 +72,7 @@ namespace OnlineBookOrderManagementSystem.Controllers
             {
                 //_context.Add(category);
                 await _unitOfWork.Category.Add(category);
-                _unitOfWork.Save();
+                await _unitOfWork.Save();
                 TempData["success"] = "Category Created Successfully";
                 return RedirectToAction(nameof(Index));
             }
@@ -86,7 +88,7 @@ namespace OnlineBookOrderManagementSystem.Controllers
             }
 
             //var category = await _context.categories.FindAsync(id);
-            var category = await _unitOfWork.Category.Get(x=>x.Id==id);
+            var category = await _unitOfWork.Category.Get(x => x.Id == id);
             if (category == null)
             {
                 return NotFound();
@@ -113,7 +115,7 @@ namespace OnlineBookOrderManagementSystem.Controllers
                     //_context.Update(category);
                     await _unitOfWork.Category.Update(category);
                     //await _context.SaveChangesAsync();
-                    _unitOfWork.Save();
+                    await _unitOfWork.Save();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -156,14 +158,13 @@ namespace OnlineBookOrderManagementSystem.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             //var category = await _context.categories.FindAsync(id);
-            var category = await _unitOfWork.Category.Get(x=>x.Id==id);
+            var category = await _unitOfWork.Category.Get(x => x.Id == id);
             if (category != null)
             {
                 //_context.categories.Remove(category);
                 await _unitOfWork.Category.Remove(category);
             }
-
-            _unitOfWork.Save();
+            await _unitOfWork.Save();
             TempData["success"] = "Category Deleted Successfully";
             return RedirectToAction(nameof(Index));
         }
