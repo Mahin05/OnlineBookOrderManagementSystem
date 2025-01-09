@@ -16,17 +16,19 @@ namespace OnlineBookOrderManagementSystem.Controllers
     {
         private readonly ApplicationDBContext _context;
         private readonly ICategoryReposiory categoryReposiory;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CategoryController(ApplicationDBContext context,ICategoryReposiory categoryReposiory)
+        public CategoryController(IUnitOfWork unitOfWork)
         {
-            _context = context;
-            this.categoryReposiory = categoryReposiory;
+            //_context = context;
+            //this.categoryReposiory = categoryReposiory;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: Category
         public async Task<IActionResult> Index()
         {
-            var categories = categoryReposiory.GetAll();
+            var categories = _unitOfWork.Category.GetAll();
             //var categoriess = _context.categories.ToListAsync();
             //return View(await _context.categories.ToListAsync());
             return View(await categories);
@@ -42,7 +44,7 @@ namespace OnlineBookOrderManagementSystem.Controllers
 
             //var category = await _context.categories
             //    .FirstOrDefaultAsync(m => m.Id == id);
-            var category = await categoryReposiory.Get(m => m.Id == id);
+            var category = await _unitOfWork.Category.Get(m => m.Id == id);
             if (category == null)
             {
                 return NotFound();
@@ -67,8 +69,8 @@ namespace OnlineBookOrderManagementSystem.Controllers
             if (ModelState.IsValid)
             {
                 //_context.Add(category);
-                await categoryReposiory.Add(category);
-                await categoryReposiory.Save();
+                await _unitOfWork.Category.Add(category);
+                _unitOfWork.Save();
                 TempData["success"] = "Category Created Successfully";
                 return RedirectToAction(nameof(Index));
             }
@@ -84,7 +86,7 @@ namespace OnlineBookOrderManagementSystem.Controllers
             }
 
             //var category = await _context.categories.FindAsync(id);
-            var category = await categoryReposiory.Get(x=>x.Id==id);
+            var category = await _unitOfWork.Category.Get(x=>x.Id==id);
             if (category == null)
             {
                 return NotFound();
@@ -109,9 +111,9 @@ namespace OnlineBookOrderManagementSystem.Controllers
                 try
                 {
                     //_context.Update(category);
-                    await categoryReposiory.Update(category);
+                    await _unitOfWork.Category.Update(category);
                     //await _context.SaveChangesAsync();
-                    await categoryReposiory.Save();
+                    _unitOfWork.Save();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -139,7 +141,7 @@ namespace OnlineBookOrderManagementSystem.Controllers
             }
 
             //var category = await _context.categories.FirstOrDefaultAsync(m => m.Id == id);
-            var category = await categoryReposiory.Get(m => m.Id == id);
+            var category = await _unitOfWork.Category.Get(m => m.Id == id);
             if (category == null)
             {
                 return NotFound();
@@ -154,14 +156,14 @@ namespace OnlineBookOrderManagementSystem.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             //var category = await _context.categories.FindAsync(id);
-            var category = await categoryReposiory.Get(x=>x.Id==id);
+            var category = await _unitOfWork.Category.Get(x=>x.Id==id);
             if (category != null)
             {
                 //_context.categories.Remove(category);
-                await categoryReposiory.Remove(category);
+                await _unitOfWork.Category.Remove(category);
             }
 
-            await _context.SaveChangesAsync();
+            _unitOfWork.Save();
             TempData["success"] = "Category Deleted Successfully";
             return RedirectToAction(nameof(Index));
         }
