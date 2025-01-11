@@ -5,16 +5,16 @@ using OnlineBookOrderManagementSystem.Repositories.IRepository;
 
 namespace OnlineBookOrderManagementSystem.Repositories.Repository
 {
-    public class CategoryReposiory : Repository<Category>, ICategoryReposiory
+    public class ProductReposiory : Repository<Product>, IProductReposiory
     {
         private readonly ApplicationDBContext _db;
-        public CategoryReposiory(ApplicationDBContext db) : base(db)
+        public ProductReposiory(ApplicationDBContext db) : base(db)
         {
             _db = db;
         }
 
 
-        public async Task Update(Category entity)
+        public async Task Update(Product entity)
         {
             _db.Update(entity);
         }
