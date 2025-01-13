@@ -1,4 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Drawing.Printing;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace OnlineBookOrderManagementSystem.Models
 {
@@ -29,5 +32,13 @@ namespace OnlineBookOrderManagementSystem.Models
         [Display(Name = "Price for 100+")]
         [Range(1,1000)]
         public double Price100 { get; set; }
+
+
+        [ForeignKey("Category")]
+        public int CategoryId { get; set; }
+        public Category? Category { get; set; }
+
+        [ValidateNever]
+        public string ImageUrl { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -17,20 +18,20 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
     {
         private readonly ApplicationDBContext _context;
         private readonly IProductReposiory productReposiory;
-        private readonly IUnitOfWork unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ProductsController(ApplicationDBContext context, ProductReposiory productReposiory, IUnitOfWork unitOfWork)
+        public ProductsController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
         {
-            _context = context;
-            this.productReposiory = productReposiory;
-            this.unitOfWork= unitOfWork;
+            _unitOfWork = unitOfWork;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: Admin/Products
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var products = unitOfWork.Product.GetAll();
-            return View(await products);
+            var products = _unitOfWork.Product.GetAll().Include(x=>x.Category);
+            return View(products);
         }
 
         // GET: Admin/Products/Details/5
@@ -43,7 +44,7 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
 
             //var product = await _context.products
             //    .FirstOrDefaultAsync(m => m.Id == id);
-            var product = await unitOfWork.Product.Get(m => m.Id == id);
+            var product = await _unitOfWork.Product.Get(m => m.Id == id);
             if (product == null)
             {
                 return NotFound();
@@ -53,22 +54,74 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
         }
 
         // GET: Admin/Products/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Upsert(int? Id)
         {
-            return View();
+            // Initialize the Category List for the dropdown
+            IEnumerable<SelectListItem> CategoryList = (_unitOfWork.Category.GetAll())
+                .Select(x => new SelectListItem
+                {
+                    Text = x.Name,
+                    Value = x.Id.ToString()
+                });
+            ViewBag.CategoryList = CategoryList;
+
+            // Check if this is an Insert or Update operation
+            if (Id == null)
+            {
+                // Insert: Return a blank product model to the view
+                return View(new Product());
+            }
+            else
+            {
+                // Update: Fetch the product for the given Id
+                var product = await _unitOfWork.Product.Get(m => m.Id == Id);
+                if (product == null)
+                {
+                    return NotFound();
+                }
+                return View(product);
+            }
         }
+
 
         // POST: Admin/Products/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Discription,ISBN,Author,ListPrice,Price,Price50,Price100")] Product product)
+        public async Task<IActionResult> Upsert(Product product, IFormFile? file)
         {
             if (ModelState.IsValid)
             {
-                await unitOfWork.Product.Add(product);
-                await unitOfWork.Save();
+                var wwwRootPath = _webHostEnvironment.WebRootPath;
+                if (file != null)
+                {
+                    var fileName = Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    var productFolder = Path.Combine(wwwRootPath, @"Images\product");
+                    if (!string.IsNullOrEmpty(product.ImageUrl))
+                    {
+                        var oldImagePath = Path.Combine(wwwRootPath, product.ImageUrl.TrimStart('\\'));
+                        if (System.IO.File.Exists(oldImagePath))
+                        {
+                            System.IO.File.Delete(oldImagePath);
+                        }
+                    }
+                    using (var fileStream = new FileStream(Path.Combine(productFolder, fileName), FileMode.Create))
+                    {
+                        file.CopyTo(fileStream);
+                    }
+                    product.ImageUrl = @"\Images\product\" + fileName;
+                    //productModel.Product.ImageUrl = productFolder+fileName;
+                }
+                if (product.Id == null)
+                {
+                    await _unitOfWork.Product.Add(product);
+                }
+                else
+                {
+                    await _unitOfWork.Product.Update(product);
+                }
+                await _unitOfWork.Save();
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
@@ -82,7 +135,7 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var product = await unitOfWork.Product.Get(m=>m.Id==id);
+            var product = await _unitOfWork.Product.Get(m=>m.Id==id);
             if (product == null)
             {
                 return NotFound();
@@ -106,8 +159,8 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
             {
                 try
                 {
-                    await unitOfWork.Product.Update(product);
-                    await unitOfWork.Save();
+                    await _unitOfWork.Product.Update(product);
+                    await _unitOfWork.Save();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -133,7 +186,7 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var product = await unitOfWork.Product.Get(m => m.Id == id);
+            var product = await _unitOfWork.Product.Get(m => m.Id == id);
             if (product == null)
             {
                 return NotFound();
@@ -147,13 +200,13 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var product = await unitOfWork.Product.Get(m=>m.Id==id);
+            var product = await _unitOfWork.Product.Get(m=>m.Id==id);
             if (product != null)
             {
-                await unitOfWork.Product.Remove(product);
+                await _unitOfWork.Product.Remove(product);
             }
 
-            await unitOfWork.Save();
+            await _unitOfWork.Save();
             return RedirectToAction(nameof(Index));
         }
 

@@ -27,9 +27,9 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
         }
 
         // GET: Category
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var categories = await _unitOfWork.Category.GetAll();
+            var categories =  _unitOfWork.Category.GetAll();
             //var categoriess = _context.categories.ToListAsync();
             //return View(await _context.categories.ToListAsync());
             var Result = categories.OrderBy(x => x.DisplayOrder);

@@ -16,7 +16,7 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
 
         public async Task Update(Product entity)
         {
-            _db.Update(entity);
+            _db.products.Update(entity);
         }
 
     }

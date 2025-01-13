@@ -26,10 +26,15 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<T>> GetAll()
+        public IQueryable<T> GetAll()
+        {
+            //IQueryable<T> query = dbset;
+            return dbset;
+        }
+        public IEnumerable<T> GetAllForDropDown()
         {
             IQueryable<T> query = dbset;
-            return await query.ToListAsync();
+            return query.ToList();
         }
 
         public async Task Remove(T entity)
