@@ -68,7 +68,6 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
             // Check if this is an Insert or Update operation
             if (Id == null)
             {
-                // Insert: Return a blank product model to the view
                 return View(new Product());
             }
             else
@@ -115,10 +114,12 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
                 }
                 if (product.Id == null)
                 {
+                    TempData["success"] = "Product Created Successfully!";
                     await _unitOfWork.Product.Add(product);
                 }
                 else
                 {
+                    TempData["success"] = "Product Updated Successfully!";
                     await _unitOfWork.Product.Update(product);
                 }
                 await _unitOfWork.Save();
@@ -203,6 +204,7 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
             var product = await _unitOfWork.Product.Get(m=>m.Id==id);
             if (product != null)
             {
+                TempData["success"] = "Product Deleted Successfully!";
                 await _unitOfWork.Product.Remove(product);
             }
 
