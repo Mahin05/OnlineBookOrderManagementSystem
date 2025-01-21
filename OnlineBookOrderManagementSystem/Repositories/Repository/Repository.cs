@@ -25,6 +25,12 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
             query = query.Where(filter);
             return await query.FirstOrDefaultAsync();
         }
+        public Task<T> GetDetails(Expression<Func<T, bool>> filter)
+        {
+            IQueryable<T> query = dbset;
+            query = query.Where(filter);
+            return query.FirstOrDefaultAsync();
+        }
 
         public IQueryable<T> GetAll()
         {

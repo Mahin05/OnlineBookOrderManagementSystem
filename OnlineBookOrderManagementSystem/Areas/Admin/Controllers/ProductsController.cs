@@ -216,5 +216,16 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
         {
             return _context.products.Any(e => e.Id == id);
         }
+
+
+        #region API
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var products = _unitOfWork.Product.GetAll().Include(x=>x.Category);
+            return Json(new { data = products });
+        }
+        #endregion
+
     }
 }

@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using OnlineBookOrderManagementSystem.Models;
 
 namespace OnlineBookOrderManagementSystem.Data
 {
-    public class ApplicationDBContext: DbContext
+    public class ApplicationDBContext: IdentityDbContext
     {
         public ApplicationDBContext(DbContextOptions options) : base(options)
         {
