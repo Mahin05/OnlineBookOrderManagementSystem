@@ -9,11 +9,13 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
         private readonly ApplicationDBContext _db;
         public ICategoryReposiory Category { get; private set; }
         public IProductReposiory Product { get; private set; }
+        public ICompanyReposiory Company { get; private set; }
         public UnitOfWork(ApplicationDBContext db)
         {
             _db = db;
             Category= new CategoryReposiory(_db);
             Product= new ProductReposiory(_db);
+            Company = new CompanyReposiory(_db);
         }
 
         public async Task Save()

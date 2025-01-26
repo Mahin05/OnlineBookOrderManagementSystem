@@ -12,6 +12,7 @@ namespace OnlineBookOrderManagementSystem.Data
         public DbSet<Category> categories { get; set; }
         public DbSet<Product> products { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Company> Companies { get; set; }
 
     }
 }
