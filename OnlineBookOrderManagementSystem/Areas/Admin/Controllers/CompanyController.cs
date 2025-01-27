@@ -162,7 +162,7 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
         }
         #region API
         [HttpGet]
-        public IActionResult GetAll()
+        public IActionResult GetAllCompany()
         {
             var companies = _unitOfWork.Company.GetAll();
             return Json(new { data = companies });
