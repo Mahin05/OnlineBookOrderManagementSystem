@@ -62,12 +62,12 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,StreetAddress,City,State,PostalCode,PhoneNumber")] Company company)
+        public IActionResult Create([Bind("Id,Name,StreetAddress,City,State,PostalCode,PhoneNumber")] Company company)
         {
             if (ModelState.IsValid)
             {
-                await _unitOfWork.Company.Add(company);
-                await _unitOfWork.Save();
+                _unitOfWork.Company.Add(company);
+                _unitOfWork.Save();
                 return RedirectToAction(nameof(Index));
             }
             return View(company);
@@ -105,8 +105,8 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
             {
                 try
                 {
-                    await _unitOfWork.Company.Update(company);
-                    await _unitOfWork.Save();
+                    _unitOfWork.Company.Update(company);
+                    _unitOfWork.Save();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -152,7 +152,7 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
                 await _unitOfWork.Company.Remove(company);
             }
 
-            await _unitOfWork.Save();
+            _unitOfWork.Save();
             return RedirectToAction(nameof(Index));
         }
 

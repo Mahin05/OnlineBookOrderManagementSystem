@@ -117,14 +117,14 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
                 if (product.Id == null)
                 {
                     TempData["success"] = "Product Created Successfully!";
-                    await _unitOfWork.Product.Add(product);
+                    _unitOfWork.Product.Add(product);
                 }
                 else
                 {
                     TempData["success"] = "Product Updated Successfully!";
-                    await _unitOfWork.Product.Update(product);
+                    _unitOfWork.Product.Update(product);
                 }
-                await _unitOfWork.Save();
+                _unitOfWork.Save();
                 return RedirectToAction(nameof(Index));
             }
             return View(product);
@@ -162,8 +162,8 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
             {
                 try
                 {
-                    await _unitOfWork.Product.Update(product);
-                    await _unitOfWork.Save();
+                    _unitOfWork.Product.Update(product);
+                    _unitOfWork.Save();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -210,7 +210,7 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
                 await _unitOfWork.Product.Remove(product);
             }
 
-            await _unitOfWork.Save();
+            _unitOfWork.Save();
             return RedirectToAction(nameof(Index));
         }
 

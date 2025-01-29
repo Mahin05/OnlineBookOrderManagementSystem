@@ -5,7 +5,9 @@
         ICategoryReposiory Category { get; }
         IProductReposiory Product { get; }
         ICompanyReposiory Company { get; }
+        IShoppingCartReposiory ShoppingCart { get; }
         //void Save();
-        Task Save();
+        //Task Save();
+        void Save();
     }
 }

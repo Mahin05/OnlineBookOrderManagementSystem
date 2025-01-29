@@ -10,22 +10,24 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
         public ICategoryReposiory Category { get; private set; }
         public IProductReposiory Product { get; private set; }
         public ICompanyReposiory Company { get; private set; }
+        public IShoppingCartReposiory ShoppingCart { get; private set; }
         public UnitOfWork(ApplicationDBContext db)
         {
             _db = db;
             Category= new CategoryReposiory(_db);
             Product= new ProductReposiory(_db);
             Company = new CompanyReposiory(_db);
+            ShoppingCart = new ShoppingCartReposiory(_db);
         }
 
-        public async Task Save()
-        {
-             await _db.SaveChangesAsync();
-        }
-        //public void Save()
+        //public async Task Save()
         //{
-        //     _db.SaveChangesAsync();
+        //     await _db.SaveChangesAsync();
         //}
+        public void Save()
+        {
+            _db.SaveChangesAsync();
+        }
 
     }
 }

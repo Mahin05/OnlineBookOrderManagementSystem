@@ -14,9 +14,13 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
             _db = db;
             this.dbset = _db.Set<T>();
         }
-        public async Task Add(T entity)
+        //public async Task Add(T entity)
+        //{
+        //    await dbset.AddAsync(entity);
+        //}
+        public void Add(T entity)
         {
-            await dbset.AddAsync(entity);
+            dbset.AddAsync(entity);
         }
 
         public async Task<T> Get(Expression<Func<T, bool>> filter)
@@ -53,7 +57,11 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
             dbset.RemoveRange(entity);
         }
 
-        public async Task Update(T entity)
+        //public async Task Update(T entity)
+        //{
+        //    dbset.Update(entity);
+        //}
+        public void Update(T entity)
         {
             dbset.Update(entity);
         }

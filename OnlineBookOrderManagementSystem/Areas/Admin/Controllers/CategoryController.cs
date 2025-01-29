@@ -68,13 +68,13 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,DisplayOrder")] Category category)
+        public IActionResult Create([Bind("Id,Name,DisplayOrder")] Category category)
         {
             if (ModelState.IsValid)
             {
                 //_context.Add(category);
-                await _unitOfWork.Category.Add(category);
-                await _unitOfWork.Save();
+                _unitOfWork.Category.Add(category);
+                _unitOfWork.Save();
                 TempData["success"] = "Category Created Successfully";
                 return RedirectToAction(nameof(Index));
             }
@@ -103,7 +103,7 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,DisplayOrder")] Category category)
+        public IActionResult Edit(int id, [Bind("Id,Name,DisplayOrder")] Category category)
         {
             if (id != category.Id)
             {
@@ -115,9 +115,9 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
                 try
                 {
                     //_context.Update(category);
-                    await _unitOfWork.Category.Update(category);
+                    _unitOfWork.Category.Update(category);
                     //await _context.SaveChangesAsync();
-                    await _unitOfWork.Save();
+                    _unitOfWork.Save();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -166,7 +166,7 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
                 //_context.categories.Remove(category);
                 await _unitOfWork.Category.Remove(category);
             }
-            await _unitOfWork.Save();
+            _unitOfWork.Save();
             TempData["success"] = "Category Deleted Successfully";
             return RedirectToAction(nameof(Index));
         }
