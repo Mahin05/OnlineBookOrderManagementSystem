@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnlineBookOrderManagementSystem.Data;
+using OnlineBookOrderManagementSystem.Models;
 using OnlineBookOrderManagementSystem.Repositories.IRepository;
 using System.Linq.Expressions;
 
@@ -18,9 +19,9 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
         //{
         //    await dbset.AddAsync(entity);
         //}
-        public void Add(T entity)
+        public async void Add(T entity)
         {
-            dbset.AddAsync(entity);
+            await dbset.AddAsync(entity);
         }
 
         public async Task<T> Get(Expression<Func<T, bool>> filter)
@@ -28,6 +29,13 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
             IQueryable<T> query = dbset;
             query = query.Where(filter);
             return await query.FirstOrDefaultAsync();
+        }
+
+        public Task GetCart(Expression<Func<T, bool>> filter)
+        {
+            IQueryable<T> query = dbset;
+            query = query.Where(filter);
+            return query.FirstOrDefaultAsync();
         }
         public Task<T> GetDetails(Expression<Func<T, bool>> filter)
         {
@@ -57,14 +65,14 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
             dbset.RemoveRange(entity);
         }
 
-        //public async Task Update(T entity)
-        //{
-        //    dbset.Update(entity);
-        //}
-        public void Update(T entity)
+        public async Task Update(T entity)
         {
             dbset.Update(entity);
         }
+        //public void Update(T entity)
+        //{
+        //    dbset.Update(entity);
+        //}
 
     }
 }

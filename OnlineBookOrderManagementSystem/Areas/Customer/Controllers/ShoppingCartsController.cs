@@ -34,6 +34,7 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
             var GetUserId = (ClaimsIdentity)User.Identity;
             var UserId = GetUserId.FindFirst(ClaimTypes.NameIdentifier).Value;
             var ShoppingCart = _unitOfWork.ShoppingCart.GetAll().Where(x=>x.ApplicationUserId==UserId).Include(x=>x.Product);
+            ViewBag.TotalCart = ShoppingCart.Count();
             double totalOrder = 0;
             foreach(var cart in ShoppingCart)
             {
@@ -54,6 +55,23 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
             }
             ViewBag.TotalOrder = totalOrder;
             return View(ShoppingCart);
+        }
+
+        public async Task<IActionResult> plus(int? cartId)
+        {
+            var ShoppingCart = await _unitOfWork.ShoppingCart.Get(x => x.id == cartId);
+            ShoppingCart.Count += 1;
+            _unitOfWork.ShoppingCart.Update(ShoppingCart);
+            _unitOfWork.Save();
+            return RedirectToAction(nameof(Index));
+        }
+        public async Task<IActionResult> minus(int? cartId)
+        {
+            var ShoppingCart = await _unitOfWork.ShoppingCart.Get(x => x.id == cartId);
+            ShoppingCart.Count -= 1;
+            _unitOfWork.ShoppingCart.Update(ShoppingCart);
+            _unitOfWork.Save();
+            return RedirectToAction(nameof(Index));
         }
 
         public double GetPriceBasedOnQty(ShoppingCart model)

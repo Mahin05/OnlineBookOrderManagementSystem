@@ -10,8 +10,8 @@ namespace OnlineBookOrderManagementSystem.Repositories.IRepository
         Task<T> GetDetails(Expression<Func<T, bool>> filter);
         //Task Add(T entity);
         void Add(T entity);
-        //Task Update(T entity);
-        void Update(T entity);
+        Task Update(T entity);
+        //void Update(T entity);
         Task Remove(T entity);
         Task RemoveRange(T entity);
     }
