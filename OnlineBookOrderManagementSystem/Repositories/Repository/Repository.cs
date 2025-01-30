@@ -19,9 +19,9 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
         //{
         //    await dbset.AddAsync(entity);
         //}
-        public async void Add(T entity)
+        public void Add(T entity)
         {
-            await dbset.AddAsync(entity);
+            dbset.AddAsync(entity);
         }
 
         public async Task<T> Get(Expression<Func<T, bool>> filter)

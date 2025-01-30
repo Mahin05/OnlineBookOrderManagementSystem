@@ -61,7 +61,7 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
         {
             var ShoppingCart = await _unitOfWork.ShoppingCart.Get(x => x.id == cartId);
             ShoppingCart.Count += 1;
-            _unitOfWork.ShoppingCart.Update(ShoppingCart);
+            await _unitOfWork.ShoppingCart.Update(ShoppingCart);
             _unitOfWork.Save();
             return RedirectToAction(nameof(Index));
         }
@@ -69,7 +69,7 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
         {
             var ShoppingCart = await _unitOfWork.ShoppingCart.Get(x => x.id == cartId);
             ShoppingCart.Count -= 1;
-            _unitOfWork.ShoppingCart.Update(ShoppingCart);
+            await _unitOfWork.ShoppingCart.Update(ShoppingCart);
             _unitOfWork.Save();
             return RedirectToAction(nameof(Index));
         }
