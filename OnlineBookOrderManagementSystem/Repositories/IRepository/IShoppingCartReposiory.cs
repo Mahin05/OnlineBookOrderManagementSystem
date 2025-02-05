@@ -5,7 +5,7 @@ namespace OnlineBookOrderManagementSystem.Repositories.IRepository
 {
     public interface IShoppingCartReposiory : IRepository<ShoppingCart>
     {
-        Task Update(ShoppingCart obj);
+        void Update(ShoppingCart entity);
         //void Update(IQueryable<ShoppingCart> obj);
     }
 }

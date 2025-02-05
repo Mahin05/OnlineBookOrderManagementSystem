@@ -64,11 +64,6 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
         {
             dbset.RemoveRange(entity);
         }
-
-        public async Task Update(T entity)
-        {
-            dbset.Update(entity);
-        }
         //public void Update(T entity)
         //{
         //    dbset.Update(entity);

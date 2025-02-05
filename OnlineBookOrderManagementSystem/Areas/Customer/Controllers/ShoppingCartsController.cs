@@ -29,7 +29,7 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
         // GET: Customer/ShoppingCarts
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             var GetUserId = (ClaimsIdentity)User.Identity;
             var UserId = GetUserId.FindFirst(ClaimTypes.NameIdentifier).Value;
@@ -57,19 +57,19 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
             return View(ShoppingCart);
         }
 
-        public async Task<IActionResult> plus(int? cartId)
+        public IActionResult plus(int? cartId)
         {
-            var ShoppingCart = await _unitOfWork.ShoppingCart.Get(x => x.id == cartId);
+            ShoppingCart ShoppingCart = _unitOfWork.ShoppingCart.Get(x => x.id == cartId).GetAwaiter().GetResult();
             ShoppingCart.Count += 1;
-            await _unitOfWork.ShoppingCart.Update(ShoppingCart);
+            _unitOfWork.ShoppingCart.Update(ShoppingCart);
             _unitOfWork.Save();
             return RedirectToAction(nameof(Index));
         }
-        public async Task<IActionResult> minus(int? cartId)
+        public IActionResult minus(int? cartId)
         {
-            var ShoppingCart = await _unitOfWork.ShoppingCart.Get(x => x.id == cartId);
+            ShoppingCart ShoppingCart = _unitOfWork.ShoppingCart.Get(x => x.id == cartId).GetAwaiter().GetResult();
             ShoppingCart.Count -= 1;
-            await _unitOfWork.ShoppingCart.Update(ShoppingCart);
+            _unitOfWork.ShoppingCart.Update(ShoppingCart);
             _unitOfWork.Save();
             return RedirectToAction(nameof(Index));
         }
@@ -195,37 +195,38 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
         }
 
         // GET: Customer/ShoppingCarts/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //public async Task<IActionResult> Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var shoppingCart = await _context.ShoppingCarts
-                .Include(s => s.ApplicationUser)
-                .Include(s => s.Product)
-                .FirstOrDefaultAsync(m => m.id == id);
-            if (shoppingCart == null)
-            {
-                return NotFound();
-            }
+        //    var shoppingCart = await _context.ShoppingCarts
+        //        .Include(s => s.ApplicationUser)
+        //        .Include(s => s.Product)
+        //        .FirstOrDefaultAsync(m => m.id == id);
+        //    if (shoppingCart == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return View(shoppingCart);
-        }
+        //    return View(shoppingCart);
+        //}
 
         // POST: Customer/ShoppingCarts/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteConfirmed(int cartId)
+        public async Task<IActionResult> Delete(int cartId)
         {
-            var shoppingCart = await _context.ShoppingCarts.FindAsync(id);
+            var shoppingCart = await _context.ShoppingCarts.FindAsync(cartId);
             if (shoppingCart != null)
             {
-                _context.ShoppingCarts.Remove(shoppingCart);
+                _unitOfWork.ShoppingCart.Remove(shoppingCart);
             }
 
-            await _context.SaveChangesAsync();
+            _unitOfWork.Save();
             return RedirectToAction(nameof(Index));
         }
 

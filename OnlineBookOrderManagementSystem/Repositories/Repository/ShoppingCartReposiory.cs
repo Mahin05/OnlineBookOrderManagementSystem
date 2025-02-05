@@ -14,7 +14,7 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
         }
 
 
-        public async Task Update(ShoppingCart entity)
+        public void Update(ShoppingCart entity)
         {
             _db.ShoppingCarts.Update(entity);
         }

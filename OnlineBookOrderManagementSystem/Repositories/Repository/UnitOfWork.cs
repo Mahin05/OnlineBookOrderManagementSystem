@@ -26,7 +26,7 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
         //}
         public void Save()
         {
-            _db.SaveChangesAsync();
+            _db.SaveChanges();
         }
 
     }
