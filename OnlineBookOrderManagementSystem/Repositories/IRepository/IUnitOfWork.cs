@@ -6,6 +6,8 @@
         IProductReposiory Product { get; }
         ICompanyReposiory Company { get; }
         IShoppingCartReposiory ShoppingCart { get; }
+        IOrderHeaderReposiory OrderHeader { get; }
+        IOrderDetailReposiory OrderDetail { get; }
         //void Save();
         //Task Save();
         void Save();
