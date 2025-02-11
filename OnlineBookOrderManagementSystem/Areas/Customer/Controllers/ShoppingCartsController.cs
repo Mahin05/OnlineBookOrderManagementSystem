@@ -227,6 +227,7 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
             }
 
             _unitOfWork.Save();
+            TempData["success"] = "Item Removed!";
             return RedirectToAction(nameof(Index));
         }
 
