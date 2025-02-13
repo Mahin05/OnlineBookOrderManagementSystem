@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AspNetCore.Reporting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineBookOrderManagementSystem.Data;
+using OnlineBookOrderManagementSystem.HelperMethods;
 using OnlineBookOrderManagementSystem.Models;
 using OnlineBookOrderManagementSystem.Repositories.IRepository;
 using OnlineBookOrderManagementSystem.Repositories.Repository;
@@ -34,6 +36,28 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
         {
             var products = _unitOfWork.Product.GetAll().Include(x=>x.Category);
             return View(products);
+        }
+        public FileContentResult DownloadReport()
+        {
+            var products = _unitOfWork.Product.GetAll().Include(x => x.Category);
+            //string format = "PDF";
+            //string extension = "pdf";
+            string mimeType = "application/pdf";
+
+
+            //string embaddedPath = "OnlineBookOrderManagementSystem.wwwroot.Reports.ProductRPT.rdlc";
+            string reportPath = $"{this._webHostEnvironment.WebRootPath}\\Reports\\ProductRPT.rdlc";
+
+            var datatable = Helpers.ListToDataTable(products.ToList());
+
+            var localReport = new LocalReport(reportPath);
+
+
+
+            localReport.AddDataSource("dsProducts", datatable);
+
+            var res = localReport.Execute(RenderType.Pdf, 1, null, mimeType);
+            return File(res.MainStream, mimeType);
         }
 
         // GET: Admin/Products/Details/5
