@@ -8,6 +8,7 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ApplicationDBContext _db;
+        public IApplicationUserReposiory applicationUser { get; private set; }
         public ICategoryReposiory Category { get; private set; }
         public IProductReposiory Product { get; private set; }
         public ICompanyReposiory Company { get; private set; }
@@ -17,6 +18,7 @@ namespace OnlineBookOrderManagementSystem.Repositories.Repository
         public UnitOfWork(ApplicationDBContext db)
         {
             _db = db;
+            applicationUser = new ApplicationUserReposiory(_db);
             Category= new CategoryReposiory(_db);
             Product= new ProductReposiory(_db);
             Company = new CompanyReposiory(_db);

@@ -2,6 +2,7 @@
 {
     public interface IUnitOfWork
     {
+        IApplicationUserReposiory applicationUser { get; }
         ICategoryReposiory Category { get; }
         IProductReposiory Product { get; }
         ICompanyReposiory Company { get; }

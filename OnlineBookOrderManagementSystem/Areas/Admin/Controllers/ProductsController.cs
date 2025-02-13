@@ -1,13 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AspNetCore.Reporting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using OnlineBookOrderManagementSystem.Data;
 using OnlineBookOrderManagementSystem.HelperMethods;
 using OnlineBookOrderManagementSystem.Models;
@@ -40,6 +43,10 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
         public FileContentResult DownloadReport()
         {
             var products = _unitOfWork.Product.GetAll().Include(x => x.Category);
+            var GetUserId = (ClaimsIdentity)User.Identity;
+            var UserId = GetUserId.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userName = _unitOfWork.applicationUser.GetAll().Where(x=>x.Id==UserId).FirstOrDefault().Name;
+
             //string format = "PDF";
             //string extension = "pdf";
             string mimeType = "application/pdf";
@@ -51,13 +58,14 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
             var datatable = Helpers.ListToDataTable(products.ToList());
 
             var localReport = new LocalReport(reportPath);
-
-
-
             localReport.AddDataSource("dsProducts", datatable);
 
+            //var parameters = new Dictionary<string, string>();
+            //parameters.Add("PrintedBy", userName);
+            // Open report in a new window
             var res = localReport.Execute(RenderType.Pdf, 1, null, mimeType);
             return File(res.MainStream, mimeType);
+
         }
 
         // GET: Admin/Products/Details/5
