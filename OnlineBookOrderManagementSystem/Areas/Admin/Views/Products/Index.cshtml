@@ -15,7 +15,7 @@
     <a asp-action="Upsert">Create New</a>
 </p>
 <p>
-    <a asp-action="DownloadReport">Download</a>
+    <a asp-action="DownloadReport" asp-route-UserName="@ViewBag.UserName" target="_blank">Download</a>
 </p>
 @* <table id="tblData" class="table" style="width:100%;">
     <thead>

@@ -37,36 +37,68 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
         // GET: Admin/Products
         public IActionResult Index()
         {
+            var GetUserId = (ClaimsIdentity)User.Identity;
+            var UserId = GetUserId.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userName = _unitOfWork.applicationUser.GetAll().Where(x => x.Id == UserId).FirstOrDefault().Name;
+
+            ViewBag.UserName = userName;
+
             var products = _unitOfWork.Product.GetAll().Include(x=>x.Category);
             return View(products);
         }
-        public FileContentResult DownloadReport()
+
+
+        [HttpGet("DownloadReport")]
+        public async Task<IActionResult> DownloadReport([FromQuery] string UserName)
         {
             var products = _unitOfWork.Product.GetAll().Include(x => x.Category);
-            var GetUserId = (ClaimsIdentity)User.Identity;
-            var UserId = GetUserId.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var userName = _unitOfWork.applicationUser.GetAll().Where(x=>x.Id==UserId).FirstOrDefault().Name;
 
-            //string format = "PDF";
-            //string extension = "pdf";
             string mimeType = "application/pdf";
-
-
-            //string embaddedPath = "OnlineBookOrderManagementSystem.wwwroot.Reports.ProductRPT.rdlc";
-            string reportPath = $"{this._webHostEnvironment.WebRootPath}\\Reports\\ProductRPT.rdlc";
+            string reportPath = Path.Combine(_webHostEnvironment.WebRootPath, "Reports", "ProductRPT.rdlc");
 
             var datatable = Helpers.ListToDataTable(products.ToList());
-
             var localReport = new LocalReport(reportPath);
             localReport.AddDataSource("dsProducts", datatable);
 
-            //var parameters = new Dictionary<string, string>();
-            //parameters.Add("PrintedBy", userName);
-            // Open report in a new window
-            var res = localReport.Execute(RenderType.Pdf, 1, null, mimeType);
-            return File(res.MainStream, mimeType);
+            // Pass parameters from API request
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            parameters?.Add("PrintedBy", UserName ?? "Unknown");
 
+            var res = localReport.Execute(RenderType.Pdf, 1, parameters, mimeType);
+
+            return File(res.MainStream, mimeType);
         }
+
+
+        //public async Task<FileContentResult> DownloadReport()
+        //{
+        //    var products = _unitOfWork.Product.GetAll().Include(x => x.Category);
+        //    var GetUserId = (ClaimsIdentity)User.Identity;
+        //    var UserId = GetUserId.FindFirst(ClaimTypes.NameIdentifier).Value;
+        //    var userName = _unitOfWork.applicationUser.GetAll().Where(x=>x.Id==UserId).FirstOrDefault().Name;
+
+
+        //    //string format = "PDF";
+        //    //string extension = "pdf";
+        //    string mimeType = "application/pdf";
+
+
+        //    //string embaddedPath = "OnlineBookOrderManagementSystem.wwwroot.Reports.ProductRPT.rdlc";
+        //    string reportPath = $"{this._webHostEnvironment.WebRootPath}\\Reports\\ProductRPT.rdlc";
+
+        //    var datatable = Helpers.ListToDataTable(products.ToList());
+
+        //    var localReport = new LocalReport(reportPath);
+        //    localReport.AddDataSource("dsProducts", datatable);
+
+        //    Dictionary<string, string> parameters = new Dictionary<string, string>();
+        //    parameters?.Add("PrintedBy", userName);
+
+        //    // Open report in a new window
+        //    var res = localReport.Execute(RenderType.Pdf, 1, parameters, mimeType);
+        //    return File(res.MainStream, mimeType);
+
+        //}
 
         // GET: Admin/Products/Details/5
         public async Task<IActionResult> Details(int? id)
