@@ -4,6 +4,8 @@ using OnlineBookOrderManagementSystem.Repositories.IRepository;
 using OnlineBookOrderManagementSystem.Repositories.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using OnlineBookOrderManagementSystem.Models;
+using BulkyBook.DataAccess.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +17,14 @@ builder.Services.AddDbContext<ApplicationDBContext>(z => z.UseSqlServer(
 ));
 
 //builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDBContext>();
-builder.Services.AddIdentity<IdentityUser,IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDBContext>().AddDefaultTokenProviders();
+//builder.Services.AddIdentity<IdentityUser,IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<ApplicationDBContext>().AddDefaultTokenProviders();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+{
+    options.User.RequireUniqueEmail = false;
+})
+    .AddEntityFrameworkStores<ApplicationDBContext>()
+    .AddDefaultTokenProviders();
+
 
 builder.Services.ConfigureApplicationCookie(x =>
 {

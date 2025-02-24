@@ -1,11 +1,15 @@
 ﻿@using Microsoft.AspNetCore.Identity
-
-@inject SignInManager<IdentityUser> SignInManager
-@inject UserManager<IdentityUser> UserManager
+@using OnlineBookOrderManagementSystem.Models
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+@* @inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager *@
 
 <ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
-{
+    {
+       @*  var currentUser = await UserManager.GetUserAsync(User);
+        string name = currentUser?.Name ?? "User"; *@
     <li class="nav-item">
         <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
     </li>

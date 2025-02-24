@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using BulkyBook.DataAccess.Repository;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using OnlineBookOrderManagementSystem.Models;
 
 namespace OnlineBookOrderManagementSystem.Data
 {
-    public class ApplicationDBContext: IdentityDbContext
+    public class ApplicationDBContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDBContext(DbContextOptions options) : base(options)
+        public ApplicationDBContext(DbContextOptions<ApplicationDBContext> options): base(options)
         {
         }
         public DbSet<Category> categories { get; set; }
