@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using OnlineBookOrderManagementSystem.Models;
 
 namespace OnlineBookOrderManagementSystem.Areas.Identity.Pages.Account.Manage
 {
@@ -58,24 +59,27 @@ namespace OnlineBookOrderManagementSystem.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+            public string? Name { get; set; }
         }
 
-        private async Task LoadAsync(IdentityUser user)
+        private async Task LoadAsync(ApplicationUser user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+
 
             Username = userName;
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                Name=user.Name
             };
         }
 
         public async Task<IActionResult> OnGetAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User) as ApplicationUser;
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
@@ -84,10 +88,9 @@ namespace OnlineBookOrderManagementSystem.Areas.Identity.Pages.Account.Manage
             await LoadAsync(user);
             return Page();
         }
-
         public async Task<IActionResult> OnPostAsync()
         {
-            var user = await _userManager.GetUserAsync(User);
+            var user = await _userManager.GetUserAsync(User) as ApplicationUser;
             if (user == null)
             {
                 return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
@@ -99,6 +102,18 @@ namespace OnlineBookOrderManagementSystem.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
+            if (!string.IsNullOrEmpty(Input.Name) && Input.Name != user.Name)
+            {
+                user.Name = Input.Name;
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    StatusMessage = "Unexpected error when trying to update profile.";
+                    return RedirectToPage();
+                }
+            }
+
+
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             if (Input.PhoneNumber != phoneNumber)
             {
@@ -109,7 +124,6 @@ namespace OnlineBookOrderManagementSystem.Areas.Identity.Pages.Account.Manage
                     return RedirectToPage();
                 }
             }
-
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();
