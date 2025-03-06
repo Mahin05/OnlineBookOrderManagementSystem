@@ -25,6 +25,23 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
             _context = context;
             _unitOfWork = unitOfWork;
         }
+        public IActionResult Summary()
+        {
+            var GetUserId = (ClaimsIdentity)User.Identity;
+            var UserId = GetUserId.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            //var UserDeatils = _unitOfWork.applicationUser.Get(x => x.Id == UserId);
+            var UserDeatils = _unitOfWork.applicationUser.GetAll().Where(x => x.Id == UserId);
+
+            var ShoppingCart = new ShoppingCartVM
+            {
+                Name = UserDeatils.FirstOrDefault().Name
+            };
+
+
+            return View(ShoppingCart);
+        }
+
 
         // GET: Customer/ShoppingCarts
         [HttpGet]
@@ -230,41 +247,6 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
             TempData["success"] = "Item Removed!";
             return RedirectToAction(nameof(Index));
         }
-
-
-        public IActionResult Summary()
-        {
-            //var claimsIdentity = (ClaimsIdentity)User.Identity;
-            //var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-            //ShoppingCartVM = new()
-            //{
-            //    ShoppingCartList = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == userId,
-            //    includeProperties: "Product"),
-            //    OrderHeader = new()
-            //};
-
-            //ShoppingCartVM.OrderHeader.ApplicationUser = _unitOfWork.ApplicationUser.Get(u => u.Id == userId);
-
-            //ShoppingCartVM.OrderHeader.Name = ShoppingCartVM.OrderHeader.ApplicationUser.Name;
-            //ShoppingCartVM.OrderHeader.PhoneNumber = ShoppingCartVM.OrderHeader.ApplicationUser.PhoneNumber;
-            //ShoppingCartVM.OrderHeader.StreetAddress = ShoppingCartVM.OrderHeader.ApplicationUser.StreetAddress;
-            //ShoppingCartVM.OrderHeader.City = ShoppingCartVM.OrderHeader.ApplicationUser.City;
-            //ShoppingCartVM.OrderHeader.State = ShoppingCartVM.OrderHeader.ApplicationUser.State;
-            //ShoppingCartVM.OrderHeader.PostalCode = ShoppingCartVM.OrderHeader.ApplicationUser.PostalCode;
-
-
-
-            //foreach (var cart in ShoppingCartVM.ShoppingCartList)
-            //{
-            //    cart.Price = GetPriceBasedOnQuantity(cart);
-            //    ShoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
-            //}
-            //return View(ShoppingCartVM);
-            return View();
-        }
-
-
         private bool ShoppingCartExists(int id)
         {
             return _context.ShoppingCarts.Any(e => e.id == id);
