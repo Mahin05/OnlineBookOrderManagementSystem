@@ -130,6 +130,7 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
             return View(shoppingCart);
         }
 
+
         // GET: Customer/ShoppingCarts/Create
         public IActionResult Create()
         {
