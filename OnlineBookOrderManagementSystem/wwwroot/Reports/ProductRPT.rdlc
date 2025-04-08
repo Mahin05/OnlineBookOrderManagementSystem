@@ -378,7 +378,7 @@
             <DataSetName>dsProducts</DataSetName>
             <Top>0.125in</Top>
             <Height>0.5in</Height>
-            <Width>6.72917in</Width>
+            <Width>6.72918in</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -453,7 +453,7 @@
         <Height>1.01389in</Height>
         <Style />
       </Body>
-      <Width>6.72917in</Width>
+      <Width>6.72918in</Width>
       <Page>
         <PageHeader>
           <Height>0.27778in</Height>

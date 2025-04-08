@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
 using OnlineBookOrderManagementSystem.Data;
@@ -16,6 +18,7 @@ using OnlineBookOrderManagementSystem.HelperMethods;
 using OnlineBookOrderManagementSystem.Models;
 using OnlineBookOrderManagementSystem.Repositories.IRepository;
 using OnlineBookOrderManagementSystem.Repositories.Repository;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
 {
@@ -64,7 +67,8 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
             Dictionary<string, string> parameters = new Dictionary<string, string>();
             parameters?.Add("PrintedBy", UserName ?? "Unknown");
 
-            var res = localReport.Execute(RenderType.Pdf, 1, parameters, mimeType);
+            var res = localReport.Execute(RenderType.Pdf, 1, null, mimeType);
+            //var res = localReport.Execute(RenderType.Pdf, 1, parameters, mimeType);
 
             return File(res.MainStream, mimeType);
         }
@@ -290,6 +294,47 @@ namespace OnlineBookOrderManagementSystem.Areas.Admin.Controllers
         {
             var products = _unitOfWork.Product.GetAll().Include(x=>x.Category);
             return Json(new { data = products });
+        }
+        [HttpGet]
+        public IActionResult GetAllSearch(string value)
+        {
+            if(value == null)
+            {
+                var products = _unitOfWork.Product.GetAll().Include(x => x.Category);
+                return Json(new { data = products });
+            }
+            else
+            {
+                var products = _unitOfWork.Product.GetAll().Include(x => x.Category).Where(
+                    x => x.Title.Contains(value) || 
+                    x.Discription.Contains(value) ||
+                    x.ISBN.Contains(value) ||
+                    x.Author.Contains(value) ||
+                    x.Category.Name.Contains(value)
+                    );
+                return Json(new { data = products });
+            }
+                
+        }
+        [HttpGet]
+        public IActionResult GetByListPrice(int value)
+        {
+            if(value == 1)
+            {
+                var products = _unitOfWork.Product.GetAll().Include(x => x.Category).Where(x => x.ListPrice >= 100 && x.ListPrice <= 500);
+                return Json(new { data = products });
+            }
+            if(value == 2)
+            {
+                var products = _unitOfWork.Product.GetAll().Include(x => x.Category).Where(x => x.ListPrice>=600 && x.ListPrice<=1000);
+                return Json(new { data = products });
+            }
+            else
+            {
+                var products = _unitOfWork.Product.GetAll().Include(x => x.Category);
+                return Json(new { data = products });
+            }
+                
         }
         #endregion
 
