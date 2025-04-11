@@ -31,11 +31,49 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
             var UserId = GetUserId.FindFirst(ClaimTypes.NameIdentifier).Value;
 
             //var UserDeatils = _unitOfWork.applicationUser.Get(x => x.Id == UserId);
-            var UserDeatils = _unitOfWork.applicationUser.GetAll().Where(x => x.Id == UserId);
+            var UserDeatils = _unitOfWork.applicationUser.GetAll().Where(x => x.Id == UserId).FirstOrDefault();
+
+
+
+            var ShoppingCarts = _unitOfWork.ShoppingCart.GetAll().Where(x => x.ApplicationUserId == UserId).Include(x => x.Product);
+            ViewBag.TotalCart = ShoppingCarts.Count();
+            double totalOrder = 0;
+            foreach (var cart in ShoppingCarts)
+            {
+                //double price = GetPriceBasedOnQty(cart);
+                if (cart.Count <= 50)
+                {
+                    cart.Product.Price = cart.Product.Price;
+                }
+                else if (cart.Count <= 100)
+                {
+                    cart.Product.Price = cart.Product.Price50;
+                }
+                else if (cart.Count > 100)
+                {
+                    cart.Product.Price = cart.Product.Price100;
+                }
+                totalOrder += cart.Product.Price * cart.Count;
+            }
+            ViewBag.TotalOrder = totalOrder;
+
+
+
+
+
+
+
 
             var ShoppingCart = new ShoppingCartVM
             {
-                Name = UserDeatils.FirstOrDefault().Name
+                Name = UserDeatils.Name,
+                PhoneNumber = UserDeatils.PhoneNumber,
+                StreetAddress = UserDeatils.StreetAddress,
+                City = UserDeatils.City,
+                State = UserDeatils.State,
+                PostalCode = UserDeatils.PostalCode,
+                TotalOrderPrice = totalOrder,
+                ShoppingCartList = ShoppingCarts
             };
 
 

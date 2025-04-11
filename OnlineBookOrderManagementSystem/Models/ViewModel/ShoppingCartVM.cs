@@ -4,7 +4,7 @@ namespace OnlineBookOrderManagementSystem.Models.ViewModel
 {
     public class ShoppingCartVM
     {
-        public IEnumerable<ShoppingCartVM> ShoppingCartList { get; set; }
+        public IEnumerable<ShoppingCart> ShoppingCartList { get; set; }
         public OrderHeader OrderHeader { get; set; }
 
 
@@ -20,5 +20,7 @@ namespace OnlineBookOrderManagementSystem.Models.ViewModel
         public string PostalCode { get; set; }
         [Required]
         public string Name { get; set; }
+
+        public double TotalOrderPrice { get; set; }
     }
 }

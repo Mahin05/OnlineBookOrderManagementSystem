@@ -41,8 +41,8 @@
 									<label>Phone</label>
 								</div>
 								<div class="col-9">
-									<input class="form-control" />
-									<span class="text-danger"></span>
+									<input asp-for="PhoneNumber" class="form-control" />
+									<span asp-validation-for="PhoneNumber" class="text-danger"></span>
 								</div>
 							</div>
 							<div class="row my-1">
@@ -50,8 +50,8 @@
 									<label>Street Address</label>
 								</div>
 								<div class="col-9">
-									<input class="form-control" />
-									<span class="text-danger"></span>
+									<input asp-for="StreetAddress" class="form-control" />
+									<span asp-validation-for="StreetAddress" class="text-danger"></span>
 								</div>
 							</div>
 							<div class="row my-1">
@@ -59,8 +59,8 @@
 									<label>City</label>
 								</div>
 								<div class="col-9">
-									<input class="form-control" />
-									<span class="text-danger"></span>
+									<input asp-for="City" class="form-control" />
+									<span asp-validation-for="City" class="text-danger"></span>
 								</div>
 							</div>
 							<div class="row my-1">
@@ -68,8 +68,8 @@
 									<label>State</label>
 								</div>
 								<div class="col-9">
-									<input class="form-control" />
-									<span class="text-danger"></span>
+									<input asp-for="State" class="form-control" />
+									<span asp-validation-for="State" class="text-danger"></span>
 								</div>
 							</div>
 							<div class="row my-1">
@@ -77,8 +77,8 @@
 									<label>Postal Code</label>
 								</div>
 								<div class="col-9">
-									<input class="form-control" />
-									<span class="text-danger"></span>
+									<input asp-for="PostalCode" class="form-control" />
+									<span asp-validation-for="PostalCode" class="text-danger"></span>
 								</div>
 							</div>
 						</div>
@@ -87,20 +87,20 @@
 								<span class="text-info">Order Summary:</span>
 							</h4>
 							<ul class="list-group mb-3">
-							@* 	@foreach (var details in Model.ShoppingCartList)
+								@foreach (var details in Model.ShoppingCartList)
 								{
 									<li class="list-group-item d-flex justify-content-between">
 										<div>
 											<h6 class="my-0">@details.Product.Title</h6>
 											<small class="text-muted">Quantity: @details.Count</small>
 										</div>
-										<span class="text-muted">@((details.Price * details.Count).ToString("c")) </span>
+										<span class="text-muted">@((details.Product.Price * details.Count).ToString("c")) </span>
 									</li>
-								} *@
+								}
 
 								<li class="list-group-item d-flex justify-content-between bg-light">
 									<small class="text-info">Total (USD)</small>
-									<strong class="text-info">@Model.OrderHeader.OrderTotal.ToString("c")</strong>
+									<strong class="text-info">@Model.TotalOrderPrice   @* @Model.OrderHeader.OrderTotal.ToString("c") *@</strong>
 								</li>
 							</ul>
 						</div>
