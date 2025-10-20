@@ -174,7 +174,9 @@ namespace OnlineBookOrderManagementSystem.Areas.Identity.Pages.Account
                 user.PhoneNumber = Input.PhoneNumber;
 
 
-                if(Input.Role == SD.Role_Comp)
+
+
+                if (Input.Role == SD.Role_Comp)
                 {
                     user.CompanyId = Input.CompanyId;
                 };
@@ -218,6 +220,21 @@ namespace OnlineBookOrderManagementSystem.Areas.Identity.Pages.Account
                 }
                 foreach (var error in result.Errors)
                 {
+
+                    Input = new()
+                    {
+                        RoleList = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
+                        {
+                            Text = i,
+                            Value = i
+                        }),
+                        CompanyList = _unitOfWork.Company.GetAll().Select(i => new SelectListItem
+                        {
+                            Text = i.Name,
+                            Value = i.Id.ToString()
+                        })
+                    };
+
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
             }
