@@ -25,6 +25,7 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
             _context = context;
             _unitOfWork = unitOfWork;
         }
+
         public IActionResult Summary()
         {
             var GetUserId = (ClaimsIdentity)User.Identity;
