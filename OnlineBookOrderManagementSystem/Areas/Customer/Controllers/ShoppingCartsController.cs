@@ -26,6 +26,40 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
             _unitOfWork = unitOfWork;
         }
 
+
+
+
+        // GET: Customer/ShoppingCarts
+        [HttpGet]
+        [Authorize]
+        public IActionResult Index()
+        {
+            var GetUserId = (ClaimsIdentity)User.Identity;
+            var UserId = GetUserId.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var ShoppingCart = _unitOfWork.ShoppingCart.GetAll().Where(x => x.ApplicationUserId==UserId).Include(x => x.Product);
+            ViewBag.TotalCart = ShoppingCart.Count();
+            double totalOrder = 0;
+            foreach (var cart in ShoppingCart)
+            {
+                //double price = GetPriceBasedOnQty(cart);
+                if (cart.Count <= 50)
+                {
+                    cart.Product.Price = cart.Product.Price;
+                }
+                else if (cart.Count <=100)
+                {
+                    cart.Product.Price = cart.Product.Price50;
+                }
+                else if (cart.Count > 100)
+                {
+                    cart.Product.Price = cart.Product.Price100;
+                }
+                totalOrder += cart.Product.Price * cart.Count;
+            }
+            ViewBag.TotalOrder = totalOrder;
+            return View(ShoppingCart);
+        }
+
         public IActionResult Summary()
         {
             var GetUserId = (ClaimsIdentity)User.Identity;
@@ -59,12 +93,6 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
             ViewBag.TotalOrder = totalOrder;
 
 
-
-
-
-
-
-
             var ShoppingCart = new ShoppingCartVM
             {
                 Name = UserDeatils.Name,
@@ -78,38 +106,6 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
             };
 
 
-            return View(ShoppingCart);
-        }
-
-
-        // GET: Customer/ShoppingCarts
-        [HttpGet]
-        [Authorize]
-        public IActionResult Index()
-        {
-            var GetUserId = (ClaimsIdentity)User.Identity;
-            var UserId = GetUserId.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var ShoppingCart = _unitOfWork.ShoppingCart.GetAll().Where(x=>x.ApplicationUserId==UserId).Include(x=>x.Product);
-            ViewBag.TotalCart = ShoppingCart.Count();
-            double totalOrder = 0;
-            foreach(var cart in ShoppingCart)
-            {
-                //double price = GetPriceBasedOnQty(cart);
-                if (cart.Count <= 50)
-                {
-                    cart.Product.Price = cart.Product.Price;
-                }
-                else if (cart.Count <=100)
-                {
-                    cart.Product.Price = cart.Product.Price50;
-                }
-                else if (cart.Count > 100)
-                {
-                    cart.Product.Price = cart.Product.Price100;
-                }
-                totalOrder += cart.Product.Price * cart.Count;
-            }
-            ViewBag.TotalOrder = totalOrder;
             return View(ShoppingCart);
         }
 
@@ -149,147 +145,113 @@ namespace OnlineBookOrderManagementSystem.Areas.Customer.Controllers
             }
         }
 
-        // GET: Customer/ShoppingCarts/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var shoppingCart = await _context.ShoppingCarts
-                .Include(s => s.ApplicationUser)
-                .Include(s => s.Product)
-                .FirstOrDefaultAsync(m => m.id == id);
-            if (shoppingCart == null)
-            {
-                return NotFound();
-            }
-
-            return View(shoppingCart);
-        }
-
-
-        // GET: Customer/ShoppingCarts/Create
-        public IActionResult Create()
-        {
-            ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
-            ViewData["ProductId"] = new SelectList(_context.products, "Id", "Author");
-            return View();
-        }
-
-        // POST: Customer/ShoppingCarts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("id,ProductId,Count,ApplicationUserId")] ShoppingCart shoppingCart)
+        [ActionName("Summary")]
+        public IActionResult SummaryPOST()
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(shoppingCart);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", shoppingCart.ApplicationUserId);
-            ViewData["ProductId"] = new SelectList(_context.products, "Id", "Author", shoppingCart.ProductId);
-            return View(shoppingCart);
-        }
+            var GetUserId = (ClaimsIdentity)User.Identity;
+            var UserId = GetUserId.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-        // GET: Customer/ShoppingCarts/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            //var UserDeatils = _unitOfWork.applicationUser.Get(x => x.Id == UserId);
+            var UserDeatils = _unitOfWork.applicationUser.GetAll().Where(x => x.Id == UserId).FirstOrDefault();
 
-            var shoppingCart = await _context.ShoppingCarts.FindAsync(id);
-            if (shoppingCart == null)
-            {
-                return NotFound();
-            }
-            ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", shoppingCart.ApplicationUserId);
-            ViewData["ProductId"] = new SelectList(_context.products, "Id", "Author", shoppingCart.ProductId);
-            return View(shoppingCart);
-        }
+            var OrderDate = System.DateTime.Now;
 
-        // POST: Customer/ShoppingCarts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("id,ProductId,Count,ApplicationUserId")] ShoppingCart shoppingCart)
-        {
-            if (id != shoppingCart.id)
-            {
-                return NotFound();
-            }
+            var ShoppingCarts = _unitOfWork.ShoppingCart.GetAll().Where(x => x.ApplicationUserId == UserId).Include(x => x.Product);
 
-            if (ModelState.IsValid)
+            ViewBag.TotalCart = ShoppingCarts.Count();
+            double totalOrder = 0;
+            foreach (var cart in ShoppingCarts)
             {
-                try
+                //double price = GetPriceBasedOnQty(cart);
+                if (cart.Count <= 50)
                 {
-                    _context.Update(shoppingCart);
-                    await _context.SaveChangesAsync();
+                    cart.Product.Price = cart.Product.Price;
                 }
-                catch (DbUpdateConcurrencyException)
+                else if (cart.Count <= 100)
                 {
-                    if (!ShoppingCartExists(shoppingCart.id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    cart.Product.Price = cart.Product.Price50;
                 }
-                return RedirectToAction(nameof(Index));
+                else if (cart.Count > 100)
+                {
+                    cart.Product.Price = cart.Product.Price100;
+                }
+                totalOrder += cart.Product.Price * cart.Count;
             }
-            ViewData["ApplicationUserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", shoppingCart.ApplicationUserId);
-            ViewData["ProductId"] = new SelectList(_context.products, "Id", "Author", shoppingCart.ProductId);
-            return View(shoppingCart);
-        }
+            ViewBag.TotalOrder = totalOrder;
 
-        // GET: Customer/ShoppingCarts/Delete/5
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var shoppingCart = await _context.ShoppingCarts
-        //        .Include(s => s.ApplicationUser)
-        //        .Include(s => s.Product)
-        //        .FirstOrDefaultAsync(m => m.id == id);
-        //    if (shoppingCart == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(shoppingCart);
-        //}
-
-        // POST: Customer/ShoppingCarts/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int cartId)
-        public async Task<IActionResult> Delete(int cartId)
-        {
-            var shoppingCart = await _context.ShoppingCarts.FindAsync(cartId);
-            if (shoppingCart != null)
+            var ShoppingCart = new ShoppingCartVM
             {
-                _unitOfWork.ShoppingCart.Remove(shoppingCart);
-            }
+                Name = UserDeatils.Name,
+                PhoneNumber = UserDeatils.PhoneNumber,
+                StreetAddress = UserDeatils.StreetAddress,
+                City = UserDeatils.City,
+                State = UserDeatils.State,
+                PostalCode = UserDeatils.PostalCode,
+                TotalOrderPrice = totalOrder,
+                ShoppingCartList = ShoppingCarts
 
+            };
+
+            var OrderHeader = new OrderHeader
+            {
+                ApplicationUserId= UserId,
+                OrderDate=OrderDate,
+                ShippingDate=OrderDate,
+                OrderTotal=totalOrder,
+                PaymentStatus="",
+                OrderStatus="",
+                TrackingNumber="",
+                Carrier="",
+                PaymentDate=OrderDate,
+                PaymentDueDate=OrderDate,
+                SessionId="",
+                PaymentIntentId=""
+            };
+            ShoppingCart.OrderHeader=OrderHeader;
+
+            if(ShoppingCart.ShoppingCartList.FirstOrDefault().ApplicationUser.CompanyId == 0)
+            {
+                //it is a regular customer
+                ShoppingCart.OrderHeader.PaymentStatus=SD.PaymentStatusPending;
+                ShoppingCart.OrderHeader.OrderStatus=SD.StatusPending;
+            }
+            else
+            {
+                //it is a company user
+                ShoppingCart.OrderHeader.PaymentStatus=SD.PaymentStatusDelayedPayment;
+                ShoppingCart.OrderHeader.OrderStatus=SD.StatusApproved;
+            }
+            _unitOfWork.OrderHeader.Add(ShoppingCart.OrderHeader);
             _unitOfWork.Save();
-            TempData["success"] = "Item Removed!";
-            return RedirectToAction(nameof(Index));
+
+            foreach (var cart in ShoppingCart.ShoppingCartList)
+            {
+                OrderDetail orderDetail = new()
+                {
+                    ProductId = cart.ProductId,
+                    OrderHeaderId = ShoppingCart.OrderHeader.Id,
+                    Price = cart.Product.Price,
+                    Count = cart.Count
+                };
+                _unitOfWork.OrderDetail.Add(orderDetail);
+                _unitOfWork.Save();
+            }
+
+            //if (ShoppingCart.ShoppingCartList.SingleOrDefault().ApplicationUser.CompanyId == 0)
+            //{
+            //    //customer regular account and payment track
+            //    //stripe logic
+
+            //}
+
+            return RedirectToAction(nameof(OrderConfirmation), new {id=ShoppingCart.OrderHeader.Id});
         }
-        private bool ShoppingCartExists(int id)
+
+        public IActionResult OrderConfirmation(int id)
         {
-            return _context.ShoppingCarts.Any(e => e.id == id);
+            return View(id);
         }
     }
 }
